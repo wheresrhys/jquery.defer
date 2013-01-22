@@ -28,6 +28,9 @@
     }
   });
 
+  //test works on prototype
+  // play well with changing the context dynamically
+
   test('is chainable', 1, function() {
     // Not a bad test to run on collection methods.
     strictEqual(this.elems.awesome(), this.elems, 'should be chaninable');
