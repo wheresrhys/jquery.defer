@@ -25,13 +25,13 @@
     }
 
     function getBoundDeferredFunction (methodName, context, deferred) {
-        return getDeferredFunction.call(context, context[methodName], deferred);
+        return getDeferredFunction.call(this, context[methodName], deferred);
     }
 
     // Static method.
     $.deferize = function(obj, deferred, options) {
 
-        var methods, i, method;
+        var methods, i, method, exclude = {};
         
         if ($.isFunction(obj)) {
             return getDeferredFunction(obj, deferred);
@@ -43,8 +43,19 @@
             }
 
         } else {
+            if (options.exclude) {
+                methods = options.exclude.split(' ');
+                for (i = methods.length-1; i>=0; i--) {
+                    exclude.methods[i] = true;
+                }
+            }
+
             for (method in object) {
+                if (exclude[method]) {
+                    continue;
+                }
                 if (object.hasOwnProperty(method) && $.isFunction(object.method)) {
+                    
                     obj[method] = getBoundDeferredFunction(method, obj, deferred);
                 }
             }
