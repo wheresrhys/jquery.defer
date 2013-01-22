@@ -22,39 +22,173 @@
       raises(block, [expected], [message])
   */
 
-  module('jQuery#awesome', {
-    setup: function() {
-      this.elems = $('#qunit-fixture').children();
-    }
-  });
 
-  //test works on prototype
-  // play well with changing the context dynamically
+    module('jQuery.awesome', {
+        setup: function() {
+            this.obj = {
+                counter: 0,
+                method: function () {this.counter++;},
+                method2: function () {this.counter++;},
+                method3: function () {this.counter++;},
+            };
+            this.deferred = new $.Deferred();
+        }
+    });
 
-  test('is chainable', 1, function() {
-    // Not a bad test to run on collection methods.
-    strictEqual(this.elems.awesome(), this.elems, 'should be chaninable');
-  });
+    test('runs immediately when defered has already resolved', function () {
+        $.deferize(this.obj, this.deferred);
+        this.deferred.resolve();
+        this.obj.method();
+        equal(this.obj.counter, 1);
+    });
+    test('runs immediately when not passed a deferred object', function () {
+        $.deferize(this.obj, {prop: true});
+        this.obj.method();
+        equal(this.obj.counter, 1);
+    });
+    test('run delayed when defered is resolved after calling', 3, function () {
+        $.deferize(this.obj, this.deferred);
 
-  test('is awesome', 1, function() {
-    strictEqual(this.elems.awesome().text(), 'awesomeawesomeawesome', 'should be thoroughly awesome');
-  });
+        this.obj.method();
+        equal(this.obj.counter, 0);
+        this.deferred.resolve();
+        equal(this.obj.counter, 1);
 
-  module('jQuery.awesome');
+        this.obj.method();
+        equal(this.obj.counter, 2, 'thereafter works as normal');
+    });
 
-  test('is awesome', 1, function() {
-    strictEqual($.awesome(), 'awesome', 'should be thoroughly awesome');
-  });
 
-  module(':awesome selector', {
-    setup: function() {
-      this.elems = $('#qunit-fixture').children();
-    }
-  });
 
-  test('is awesome', 1, function() {
-    // Use deepEqual & .get() when comparing jQuery objects.
-    deepEqual(this.elems.filter(':awesome').get(), this.elems.last().get(), 'knows awesome when it sees it');
-  });
+    test('ignores non existent methods', function () {
+        $.deferize(this.obj, this.deferred, {methods: 'method8'});
+
+        ok(true);
+    });
+
+
+    test('only runs on specified methods', 3, function () {
+        $.deferize(this.obj, this.deferred, {methods: 'method2 method3'});
+
+        this.obj.method();
+        equal(this.obj.counter, 1);
+        this.obj.method2();
+        equal(this.obj.counter, 1);
+        this.deferred.resolve();
+        equal(this.obj.counter, 2);
+    });
+
+
+    test('doesn\'t run on excluded methods', 3, function () {
+        $.deferize(this.obj, this.deferred, {exclude: 'method2 method3'});
+
+        this.obj.method();
+        equal(this.obj.counter, 0);
+        this.obj.method2();
+        equal(this.obj.counter, 1);
+        this.deferred.resolve();
+        equal(this.obj.counter, 2);
+    });
+
+    test('includes overrides excludes', function () {
+        $.deferize(this.obj, this.deferred, {methods: 'method method2', exclude: 'method2 method3'});
+
+        this.obj.method2();
+        equal(this.obj.counter, 0);
+      
+    });
+
+    test('can be called on a function', 3, function () {
+        var counter = 0, 
+            func = function () {counter++};
+        func = $.deferize(func, this.deferred);
+
+        func();
+        equal(counter, 0);
+        this.deferred.resolve();
+        equal(counter, 1);
+        func();
+        equal(counter, 2);
+    });
+
+    test('doesn\'t affect prototype by default', 2, function () {
+        var Class = function () {};
+
+
+        Class.prototype = this.obj;
+        var obj = new Class();
+
+
+        $.deferize(this.obj1, this.deferred);
+
+
+        obj.method();
+        equal(obj.counter, 1);
+        this.deferred.resolve();
+        equal(obj.counter, 1);
+    });
+
+    test('when applied to entire prototype affects only this instance', 3, function () {
+        var Class = function () {};
+
+
+        Class.prototype = this.obj;
+        var obj1 = new Class();
+        var obj2 = new Class();
+
+
+        $.deferize(obj1, this.deferred, {applyToPrototype: true});
+
+
+        obj1.method();
+        equal(obj1.counter, 0);
+        obj2.method();
+        equal(obj2.counter, 1);
+        this.deferred.resolve();
+        equal(obj1.counter, 1);
+    });
+
+    test('still allows dynamic changing of context on functions',  function () {
+        var context = {}, 
+            func = function () {strictEqual(this, context);};
+
+        func = $.deferize(func, this.deferred);
+
+        func.call(context);
+        this.deferred.resolve();
+    });
+
+    test('still allows dynamic changing of context on methods',  function () {
+        var context = {},
+            obj = {
+              method: function () { 
+                strictEqual(this, context);
+              }
+            };
+
+        $.deferize(obj, this.deferred);
+
+
+        obj.method.call(context);
+        this.deferred.resolve();
+
+    });
+
+    test('still passes arguments in',  function () {
+        var obj = {
+            method: function (arg) { 
+                equal(arg, 'correct');
+            }
+        };
+
+        $.deferize(obj, this.deferred);
+
+        obj.method('correct');
+        this.deferred.resolve();
+
+    });
+    
+
+
 
 }(jQuery));

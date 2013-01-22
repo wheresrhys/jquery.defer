@@ -11,50 +11,56 @@
 
     function getDeferredFunction(func, deferred) {
         
-        var context = this,
-            deferredFunc = function (args) {
-            deferred.done(function () {
-                func.apply(context, args)
-            });
-        };
+        if (deferred.promise) {
+            var context = this,
+                deferredFunc = function () {
+                    var that = this !== window && this,
+                        args = arguments;
+                deferred.done(function () {
+                    func.apply(that || context, args)
+                });
+            };
 
-        deferredFunc._originalFunction = func;
+            deferredFunc._originalFunction = func;
 
-        return deferredFunc;
+            return deferredFunc;
+        }
+        return func;
         
     }
 
     function getBoundDeferredFunction (methodName, context, deferred) {
-        return getDeferredFunction.call(this, context[methodName], deferred);
+        return getDeferredFunction.call(context, context[methodName], deferred);
     }
+
 
     // Static method.
     $.deferize = function(obj, deferred, options) {
 
-        var methods, i, method, exclude = {};
+        var methods, i, method, exclude = {}, applyToPrototype = !!(options && options.applyToPrototype);
         
         if ($.isFunction(obj)) {
             return getDeferredFunction(obj, deferred);
-        } else if (options.methods) {
+        } else if (options && options.methods) {
             methods = options.methods.split(' ');
 
             for (i = methods.length-1; i>=0; i--) {
-                obj.methods[i] = getBoundDeferredFunction(methods[i], obj, deferred);
+                obj[methods[i]] = getBoundDeferredFunction(methods[i], obj, deferred);
             }
 
         } else {
-            if (options.exclude) {
+            if (options && options.exclude) {
                 methods = options.exclude.split(' ');
                 for (i = methods.length-1; i>=0; i--) {
-                    exclude.methods[i] = true;
+                    exclude[methods[i]] = true;
                 }
             }
 
-            for (method in object) {
+            for (method in obj) {
                 if (exclude[method]) {
                     continue;
                 }
-                if (object.hasOwnProperty(method) && $.isFunction(object.method)) {
+                if ((applyToPrototype || obj.hasOwnProperty(method)) && $.isFunction(obj[method])) {
                     
                     obj[method] = getBoundDeferredFunction(method, obj, deferred);
                 }
