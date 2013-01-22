@@ -1,0 +1,29 @@
+{
+  "name": "defer",
+  "title": "Defer",
+  "description": "Utility method for forcing [some of] an object's methods to wait for a deferred object to complete before running",
+  "version": "0.1.0",
+  "homepage": "https://github.com/wheresrhys/jquery.defer",
+  "author": {
+    "name": "Rhys Evans",
+    "email": "wheresrhys@gmail.com",
+    "url": "http://wheresrhys.co.uk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wheresrhys/jquery.defer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wheresrhys/jquery.defer/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/wheresrhys/jquery.defer/blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "1.5"
+  },
+  "keywords": []
+}
