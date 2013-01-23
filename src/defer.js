@@ -16,7 +16,7 @@
         this.options = options;
         this.mode = options.mode;
         this.run();
-    }
+    };
 
     Plugin.prototype = {
         run : function () {
@@ -27,7 +27,7 @@
             if (this.mode === 'undefer' && $.isFunction(this.obj)) {
                 return this.obj;
             } else if ($.isFunction(this.obj)) {
-                this.function = getDeferredFunction(this.obj, this.deferred);
+                this.func = getDeferredFunction(this.obj, this.deferred);
             } else if (options && options.methods) {
                 methods = options.methods.split(' ');
                 
@@ -96,7 +96,7 @@
         deferredFunc._originalFunction = func;
 
         return deferredFunc;
-    }
+    };
 
 
     
@@ -109,7 +109,7 @@
 
         var plug = new Plugin(obj, deferred, options);
 
-        return plug.function || obj;
+        return plug.func || obj;
 
     };
 
