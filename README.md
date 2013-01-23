@@ -6,6 +6,7 @@ Utility method for forcing a function or an object's methods to wait for a defer
 Download the [production version][min] or the [development version][max].
 
 [min]: https://raw.github.com/wheresrhys/jquery.deferize/master/dist/jquery.defer.min.js
+[max]: https://raw.github.com/wheresrhys/jquery.deferize/master/dist/jquery.defer.js
 
 In your web page:
 
