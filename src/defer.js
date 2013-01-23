@@ -10,22 +10,29 @@
 
 
     function getDeferredFunction(func, deferred) {
-        
-        if (deferred.promise) {
-            var context = this,
-                deferredFunc = function () {
-                    var that = this !== window && this,
-                        args = arguments;
-                deferred.done(function () {
+        if (!$.isArray(deferred)) {
+            if (deferred.promise) {
+                deferred = [deferred];
+            } else {
+                 return func;
+            }
+        }
+
+        var context = this,
+            deferredFunc = function () {
+                var that = this !== window && this,
+                    args = arguments;
+                //deferred.done(function () {
+                $.when.apply(null,  deferred).done(function () {
+                //$.when.apply($, deferred).then(function () {
                     func.apply(that || context, args);
                 });
             };
 
-            deferredFunc._originalFunction = func;
+        deferredFunc._originalFunction = func;
 
-            return deferredFunc;
-        }
-        return func;
+        return deferredFunc;
+       
         
     }
 
@@ -35,7 +42,7 @@
 
 
     // Static method.
-    $.deferrize = function(obj, deferred, options) {
+    $.defer = function(obj, deferred, options) {
 
         var methods, i, method, exclude = {}, applyToPrototype = !!(options && options.applyToPrototype);
         

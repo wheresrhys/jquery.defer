@@ -22,8 +22,9 @@
       raises(block, [expected], [message])
   */
 
-
-    module('jQuery.deferrize', {
+  // add support for waiting for multiple defered object
+  // add undeferr
+    module('jQuery.defer', {
         setup: function() {
             this.obj = {
                 counter: 0,
@@ -36,18 +37,18 @@
     });
 
     test('runs immediately when defered has already resolved', function () {
-        $.deferrize(this.obj, this.deferred);
+        $.defer(this.obj, this.deferred);
         this.deferred.resolve();
         this.obj.method();
         equal(this.obj.counter, 1);
     });
     test('runs immediately when not passed a deferred object', function () {
-        $.deferrize(this.obj, {prop: true});
+        $.defer(this.obj, {prop: true});
         this.obj.method();
         equal(this.obj.counter, 1);
     });
     test('run delayed when defered is resolved after calling', 3, function () {
-        $.deferrize(this.obj, this.deferred);
+        $.defer(this.obj, this.deferred);
 
         this.obj.method();
         equal(this.obj.counter, 0);
@@ -58,17 +59,43 @@
         equal(this.obj.counter, 2, 'thereafter works as normal');
     });
 
+    test('wait for multiple deferreds', 3, function () {
+        var def = new $.Deferred();
+        $.defer(this.obj, [this.deferred, def]);
+
+        this.obj.method();
+        equal(this.obj.counter, 0);
+        this.deferred.resolve();
+        equal(this.obj.counter, 0);
+
+        def.resolve();
+        equal(this.obj.counter, 1);
+    });
+
+    test('wait for defered and non defered', 2, function () {
+        
+
+        $.defer(this.obj, [this.deferred, {}]);
+
+        this.obj.method();
+        equal(this.obj.counter, 0);
+        this.deferred.resolve();
+        equal(this.obj.counter, 1);
+    });
+
+
+
 
 
     test('ignores non existent methods', function () {
-        $.deferrize(this.obj, this.deferred, {methods: 'method8'});
+        $.defer(this.obj, this.deferred, {methods: 'method8'});
 
         ok(true);
     });
 
 
     test('only runs on specified methods', 3, function () {
-        $.deferrize(this.obj, this.deferred, {methods: 'method2 method3'});
+        $.defer(this.obj, this.deferred, {methods: 'method2 method3'});
 
         this.obj.method();
         equal(this.obj.counter, 1);
@@ -80,7 +107,7 @@
 
 
     test('doesn\'t run on excluded methods', 3, function () {
-        $.deferrize(this.obj, this.deferred, {exclude: 'method2 method3'});
+        $.defer(this.obj, this.deferred, {exclude: 'method2 method3'});
 
         this.obj.method();
         equal(this.obj.counter, 0);
@@ -91,7 +118,7 @@
     });
 
     test('includes overrides excludes', function () {
-        $.deferrize(this.obj, this.deferred, {methods: 'method method2', exclude: 'method2 method3'});
+        $.defer(this.obj, this.deferred, {methods: 'method method2', exclude: 'method2 method3'});
 
         this.obj.method2();
         equal(this.obj.counter, 0);
@@ -101,7 +128,7 @@
     test('can be called on a function', 3, function () {
         var counter = 0, 
             func = function () {counter++;};
-        func = $.deferrize(func, this.deferred);
+        func = $.defer(func, this.deferred);
 
         func();
         equal(counter, 0);
@@ -119,7 +146,7 @@
         var obj = new Class();
 
 
-        $.deferrize(this.obj1, this.deferred);
+        $.defer(this.obj1, this.deferred);
 
 
         obj.method();
@@ -137,7 +164,7 @@
         var obj2 = new Class();
 
 
-        $.deferrize(obj1, this.deferred, {applyToPrototype: true});
+        $.defer(obj1, this.deferred, {applyToPrototype: true});
 
 
         obj1.method();
@@ -152,7 +179,7 @@
         var context = {}, 
             func = function () {strictEqual(this, context);};
 
-        func = $.deferrize(func, this.deferred);
+        func = $.defer(func, this.deferred);
 
         func.call(context);
         this.deferred.resolve();
@@ -166,7 +193,7 @@
               }
             };
 
-        $.deferrize(obj, this.deferred);
+        $.defer(obj, this.deferred);
 
 
         obj.method.call(context);
@@ -181,7 +208,7 @@
             }
         };
 
-        $.deferrize(obj, this.deferred);
+        $.defer(obj, this.deferred);
 
         obj.method('correct');
         this.deferred.resolve();
