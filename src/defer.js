@@ -9,7 +9,71 @@
 (function($) {
 
 
-    function getDeferredFunction(func, deferred) {
+    var Plugin = function (obj, deferred, options) {
+        
+        this.obj = obj, 
+        this.deferred = deferred, 
+        this.options = options;
+        this.mode = options.mode;
+        this.run();
+    }
+
+    Plugin.prototype = {
+        run : function () {
+            var methods, i, method, exclude = {}, options = this.options, applyToPrototype = !!(options && options.applyToPrototype);
+            
+            this.mutator = this.mutators[this.mode] ;
+
+            if (this.mode === 'undefer' && $.isFunction(this.obj)) {
+                return this.obj;
+            } else if ($.isFunction(this.obj)) {
+                this.function = getDeferredFunction(this.obj, this.deferred);
+            } else if (options && options.methods) {
+                methods = options.methods.split(' ');
+                
+                for (i = methods.length-1; i>=0; i--) {
+                    this.obj[methods[i]] = this.mutator(methods[i]);
+                }
+
+            } else {
+                if (options && options.exclude) {
+                    methods = options.exclude.split(' ');
+                    for (i = methods.length-1; i>=0; i--) {
+                        exclude[methods[i]] = true;
+                    }
+                }
+
+                for (method in this.obj) {
+                    if (exclude[method]) {
+                        continue;
+                    }
+                    if ((applyToPrototype || this.obj.hasOwnProperty(method)) && $.isFunction(this.obj[method])) {
+                        
+                        this.obj[method] = this.mutator(method);
+                    }
+                }
+            }
+
+            return this.obj;
+        },
+        
+        mutators: {
+            defer: function (methodName) {
+                return getBoundDeferredFunction(methodName, this.obj, this.deferred);
+            },
+            undefer: function (methodName) {
+                return this.obj[methodName]._originalFunction || this.obj[methodName];
+            }
+
+        }
+    };
+
+    var getBoundDeferredFunction = function (methodName, context, deferred) {
+            return getDeferredFunction.call(context, context[methodName], deferred);
+        };
+
+    var getDeferredFunction = function (func, deferred) {
+
         if (!$.isArray(deferred)) {
             if (deferred.promise) {
                 deferred = [deferred];
@@ -32,54 +96,30 @@
         deferredFunc._originalFunction = func;
 
         return deferredFunc;
-       
-        
     }
 
-    function getBoundDeferredFunction (methodName, context, deferred) {
-        return getDeferredFunction.call(context, context[methodName], deferred);
-    }
+
+    
+   
 
 
     // Static method.
     $.defer = function(obj, deferred, options) {
+        options = $.extend(options || {}, {mode: 'defer'});
 
-        var methods, i, method, exclude = {}, applyToPrototype = !!(options && options.applyToPrototype);
-        
-        if ($.isFunction(obj)) {
-            return getDeferredFunction(obj, deferred);
-        } else if (options && options.methods) {
-            methods = options.methods.split(' ');
+        var plug = new Plugin(obj, deferred, options);
 
-            for (i = methods.length-1; i>=0; i--) {
-                obj[methods[i]] = getBoundDeferredFunction(methods[i], obj, deferred);
-            }
-
-        } else {
-            if (options && options.exclude) {
-                methods = options.exclude.split(' ');
-                for (i = methods.length-1; i>=0; i--) {
-                    exclude[methods[i]] = true;
-                }
-            }
-
-            for (method in obj) {
-                if (exclude[method]) {
-                    continue;
-                }
-                if ((applyToPrototype || obj.hasOwnProperty(method)) && $.isFunction(obj[method])) {
-                    
-                    obj[method] = getBoundDeferredFunction(method, obj, deferred);
-                }
-            }
-        }
-
-        return obj;
+        return plug.function || obj;
 
     };
 
-    $.undeferrize = function (obj, deferred, options) {
 
+    $.undefer = function (obj, options) {
+        options = $.extend(options || {}, {mode: 'undefer'});
+
+        new Plugin(obj, options.deferred || null, options);
+        return obj;
+   
     };
 
 

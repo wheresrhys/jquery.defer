@@ -1,0 +1,12 @@
+div#jump_to Jump To &hellip;
+  div#jump_wrapper
+    div#jump_page
+      a.source( href="#{root_path}index.html")
+        span.file_name README
+      each source in context.sources
+        - var base_path = relative_base(source, context)
+        - var base_path_padded = base_path.replace(new RegExp("/", 'g'), " / ");
+        - var this_class = (source == file_path) ? "selected" : "";
+        a.source(class="#{this_class}", href="#{root_path}#{source}.html")
+          span.base_path #{base_path_padded}
+          span.file_name #{path.basename(source)}

@@ -22,8 +22,7 @@
       raises(block, [expected], [message])
   */
 
-  // add support for waiting for multiple defered object
-  // add undeferr
+
     module('jQuery.defer', {
         setup: function() {
             this.obj = {
@@ -214,6 +213,55 @@
         this.deferred.resolve();
 
     });
+
+    test('undefer all',  function () {
+
+        $.defer(this.obj, this.deferred);
+        $.undefer(this.obj);
+
+        this.obj.method(); 
+        equal(this.obj.counter, 1);
+    });
+
+    test('undefer specified methods', 3, function () {
+        $.defer(this.obj, this.deferred);
+        $.undefer(this.obj, {methods: 'method2 method3'});
+
+        this.obj.method();
+        equal(this.obj.counter, 0);
+        this.obj.method2();
+        equal(this.obj.counter, 1);
+        this.deferred.resolve();
+        equal(this.obj.counter, 2);
+    });
+
+
+    test('undefer all but specified methods', 3, function () {
+        $.defer(this.obj, this.deferred);
+        $.undefer(this.obj, {exclude: 'method2 method3'});
+
+        this.obj.method();
+        equal(this.obj.counter, 1);
+        this.obj.method2();
+        equal(this.obj.counter, 1);
+        this.deferred.resolve();
+        equal(this.obj.counter, 2);
+    });
+
+    // test('undefer all but specified methods', 3, function () {
+    //     $.defer(this.obj, this.deferred);
+    //     $.undefer(this.obj, {exclude: 'method2 method3'});
+
+    //     this.obj.method();
+    //     equal(this.obj.counter, 1);
+    //     this.obj.method2();
+    //     equal(this.obj.counter, 1);
+    //     this.deferred.resolve();
+    //     equal(this.obj.counter, 2);
+    // });
+
+      // add undeferr
+  // only undefer for a particular context
     
 
 
