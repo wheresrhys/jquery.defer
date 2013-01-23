@@ -1,12 +1,11 @@
 # Defer
 
-Utility method for forcing [some of] an object's methods to wait for a deferred object to complete before running
+Utility method for forcing a function or an object's methods to wait for a deferred object to complete before running. Also has an undefer method for reversing the effect.
 
 ## Getting Started
 Download the [production version][min] or the [development version][max].
 
-[min]: https://raw.github.com/wheresrhys/jquery.deferize/master/dist/defer.min.js
-[max]: https://raw.github.com/wheresrhys/jquery.deferize/master/dist/defer.js
+[min]: https://raw.github.com/wheresrhys/jquery.deferize/master/dist/jquery.defer.min.js
 
 In your web page:
 
@@ -15,7 +14,8 @@ In your web page:
 <script src="dist/defer.min.js"></script>
 <script>
 jQuery(function($) {
-  $.awesome(); // "awesome"
+  $.defer(object, deferredObject, options);
+  $.undefer(object, options);
 });
 </script>
 ```
