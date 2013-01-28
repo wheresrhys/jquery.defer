@@ -24,7 +24,15 @@ module.exports = function(grunt) {
       }
     },
     qunit: {
-      files: ['test/**/*.html']
+      urls: {
+        src: '1.5,1.6,1.7,1.8.0,1.9.0,git'.split(',').map(function(v) { 
+          return 'http://localhost:9001/test/defer.html?jquery=' + v; 
+        })
+      }
+    },
+    server: {
+      port: 9001,
+      base: '.'
     },
     lint: {
       files: ['grunt.js', 'src/**/*.js', 'test/**/*.js']
@@ -55,6 +63,17 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint qunit concat min');
+// grunt.registerMultiTask('qunit', 'tun all jasmine tests')//, function () {
+  //   grunt.log.writeln('asfsa');
+  //       for (var key in this.data) {
+  //           grunt.log.writeln(key + ': ' + this.data[key]);
+  //       }
+  //      //grunt.task.run('jasmines', 'jasmine');
+   
+  // });
+
+  // Default task.
+  grunt.registerTask('test', 'server qunit');
+  grunt.registerTask('default', 'lint server qunit concat min');
 
 };

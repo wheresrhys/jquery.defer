@@ -25,5 +25,5 @@
   "dependencies": {
     "jquery": "1.5"
   },
-  "keywords": []
+  "keywords": ["deferred", "ajax", "defer", "promise", "when", "utility"]
 }
