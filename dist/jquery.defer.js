@@ -1,4 +1,4 @@
-/*! Defer - v0.1.0 - 2013-01-28
+/*! Defer - v0.1.0 - 2013-01-29
 * https://github.com/wheresrhys/jquery.defer
 * Copyright (c) 2013 Rhys Evans; Licensed MIT */
 
