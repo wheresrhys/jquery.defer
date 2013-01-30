@@ -63,16 +63,6 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-// grunt.registerMultiTask('qunit', 'tun all jasmine tests')//, function () {
-  //   grunt.log.writeln('asfsa');
-  //       for (var key in this.data) {
-  //           grunt.log.writeln(key + ': ' + this.data[key]);
-  //       }
-  //      //grunt.task.run('jasmines', 'jasmine');
-   
-  // });
-
-  // Default task.
   grunt.registerTask('test', 'server qunit');
   grunt.registerTask('default', 'lint server qunit concat min');
   grunt.registerTask('build', 'concat min');
