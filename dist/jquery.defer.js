@@ -1,4 +1,4 @@
-/*! Defer - v0.1.0 - 2013-01-29
+/*! Defer - v0.1.0 - 2013-01-30
 * https://github.com/wheresrhys/jquery.defer
 * Copyright (c) 2013 Rhys Evans; Licensed MIT */
 
@@ -92,7 +92,6 @@
     Plugin.prototype.run = function () {
         var options = this.options, 
             applyToPrototype = !!(options && options.applyToPrototype),
-            exclude = {}, 
             methods, 
             method, 
             i;
@@ -121,16 +120,15 @@
             // If an exclude list of methods was provided create a hash table to compare method names to
             if (options && options.exclude) {
                 methods = options.exclude.split(' ');
-                for (i = methods.length-1; i>=0; i--) {
-                    exclude[methods[i]] = true;
-                }
+            } else {
+                methods = [];
             }
 
             // Run through each property of the object
             for (method in this.obj) {
 
                 // Skip over excluded methods
-                if (exclude[method]) {
+                if (methods.indexOf(method) > -1) {
                     continue;
                 }
 
