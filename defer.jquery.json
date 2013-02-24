@@ -2,7 +2,7 @@
   "name": "defer",
   "title": "Defer",
   "description": "Utility method for forcing [some of] an object's methods to wait for a deferred object to complete before running",
-  "version": "0.1.0",
+  "version": "0.1.2b",
   "homepage": "https://github.com/wheresrhys/jquery.defer",
   "author": {
     "name": "Rhys Evans",
