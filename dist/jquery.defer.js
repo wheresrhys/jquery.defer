@@ -1,9 +1,12 @@
-/*! Defer - v0.1.2b - 2013-04-11
-* https://github.com/wheresrhys/jquery.defer
-* Copyright (c) 2013 Rhys Evans; Licensed MIT */
+/*
+ * defer/undefer
+ * https://github.com/wheresrhys/jquery.defer
+ *
+ * Copyright (c) 2013 Rhys Evans
+ * Licensed under the MIT license.
+ */
 
 (function($) {
-
 
     /*
         getDeferredMethod

@@ -8,7 +8,6 @@
 
 (function($) {
 
-
     /*
         getDeferredMethod
         Creates a deferred method for a specified object
